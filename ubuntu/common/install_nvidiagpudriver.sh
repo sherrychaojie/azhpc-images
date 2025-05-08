@@ -34,11 +34,9 @@ $COMMON_DIR/write_component_version.sh "CUDA" ${CUDA_DRIVER_VERSION}
 #popd
 
 # Install NVIDIA driver
-nvidia_metadata=$(get_component_config "nvidia")
-nvidia_driver_metadata=$(jq -r '.driver' <<< $nvidia_metadata)
-NVIDIA_DRIVER_VERSION=$(jq -r '.version' <<< $nvidia_driver_metadata)
-NVIDIA_DRIVER_SHA256=$(jq -r '.sha256' <<< $nvidia_driver_metadata)
-NVIDIA_DRIVER_URL=https://us.download.nvidia.com/tesla/${NVIDIA_DRIVER_VERSION}/NVIDIA-Linux-x86_64-${NVIDIA_DRIVER_VERSION}.run
+sudo add-apt-repository -y ppa:graphics-drivers/ppa
+sudo apt-get update
+sudo apt install nvidia-headless-560 nvidia-utils-560
 
 $COMMON_DIR/download_and_verify.sh $NVIDIA_DRIVER_URL ${NVIDIA_DRIVER_SHA256}
 bash NVIDIA-Linux-x86_64-${NVIDIA_DRIVER_VERSION}.run --silent --dkms
