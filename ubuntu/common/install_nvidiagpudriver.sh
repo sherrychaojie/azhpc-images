@@ -36,7 +36,7 @@ $COMMON_DIR/write_component_version.sh "CUDA" ${CUDA_DRIVER_VERSION}
 # Install NVIDIA driver
 sudo add-apt-repository -y ppa:graphics-drivers/ppa
 sudo apt-get update
-sudo apt install nvidia-headless-560 nvidia-utils-560
+sudo apt install -y nvidia-headless-560 nvidia-utils-560
 nvidia_metadata=$(get_component_config "nvidia")
 nvidia_driver_metadata=$(jq -r '.driver' <<< $nvidia_metadata)
 NVIDIA_DRIVER_VERSION=$(jq -r '.version' <<< $nvidia_driver_metadata)
