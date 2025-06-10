@@ -1,5 +1,6 @@
 #!/bin/bash
-set -ex
+# We allow failures
+#set -ex
 
 max_attempts=5
 attempt=1
