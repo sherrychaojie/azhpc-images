@@ -1,8 +1,19 @@
 #!/bin/bash
-set -ex
+# We allow failures
+#set -ex
 
-# install pre-requisites
-./install_prerequisites.sh
+max_attempts=5
+attempt=1
+while [[ ! -f /usr/bin/jq && $attempt -le $max_attempts ]]; do
+	# install pre-requisites
+ 	# We need to disable 'set -ex' to retry
+	./install_prerequisites.sh
+	attempt=$((attempt + 1))
+	if [[ ! -f /usr/bin/jq ]]; then
+		echo "Prerequisites installation failed, retrying..."
+		sleep 30  # Wait for locks to be released
+	fi
+done
 
 export GPU="NVIDIA"
 
@@ -36,7 +47,15 @@ time ./install_utils.sh
 # $UBUNTU_COMMON_DIR/install_mpis.sh
 
 echo "Install nvidia gpu driver"
-time $UBUNTU_COMMON_DIR/install_nvidiagpudriver.sh
+attempt=1
+while [[ ! -f /usr/bin/nvidia-smi && $attempt -le $max_attempts ]]; do
+	time $UBUNTU_COMMON_DIR/install_nvidiagpudriver.sh
+	attempt=$((attempt + 1))
+	if [[ ! -f /usr/bin/nvidia-smi ]]; then
+		echo "NVIDIA driver installation failed, retrying..."
+		sleep 30  # Wait for locks to be released
+	fi
+done
 
 echo "Install NCCL"
 time $UBUNTU_COMMON_DIR/install_nccl.sh
@@ -51,7 +70,15 @@ rm -rf /var/intel/ /var/cache/*
 rm -Rf -- */
 
 echo "Install DCGM"
-time $UBUNTU_COMMON_DIR/install_dcgm.sh
+attempt=1
+while [[ ! -f /usr/bin/dcgmi && $attempt -le $max_attempts ]]; do
+	time $UBUNTU_COMMON_DIR/install_dcgm.sh
+	attempt=$((attempt + 1))
+	if [[ ! -f /usr/bin/dcgmi ]]; then
+		echo "NVIDIA driver installation failed, retrying..."
+		sleep 30  # Wait for locks to be released
+	fi
+done
 
 echo "Install Intel libraries"
 time $COMMON_DIR/install_intel_libs.sh

@@ -1,5 +1,6 @@
 #!/bin/bash
-set -ex
+# We allow failing
+#set -ex
 
 # Don't allow the kernel to be updated
 apt-mark hold linux-azure
