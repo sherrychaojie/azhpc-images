@@ -46,13 +46,29 @@ time ./install_utils.sh
 # install mpi libraries
 # $UBUNTU_COMMON_DIR/install_mpis.sh
 
-echo "Install nvidia gpu driver"
+echo "Install nvidia GPU driver"
 attempt=1
 while [[ ! -f /usr/bin/nvidia-smi && $attempt -le $max_attempts ]]; do
 	time $UBUNTU_COMMON_DIR/install_nvidiagpudriver.sh
 	attempt=$((attempt + 1))
 	if [[ ! -f /usr/bin/nvidia-smi ]]; then
 		echo "NVIDIA driver installation failed, retrying..."
+		sleep 30  # Wait for locks to be released
+	fi
+done
+
+echo "Install nvidia fabric manager"
+attempt=1
+while [[ ! -f /usr/bin/nv-fabricmanager && $attempt -le $max_attempts ]]; do
+	add-apt-repository -y ppa:graphics-drivers/ppa
+	apt-get update
+	
+	apt-get -y install nvidia-fabricmanager-560
+	systemctl enable nvidia-fabricmanager
+	systemctl start nvidia-fabricmanager
+	attempt=$((attempt + 1))
+	if [[ ! -f /usr/bin/nv-fabricmanager ]]; then
+		echo "NVIDIA fabric manager installation failed, retrying..."
 		sleep 30  # Wait for locks to be released
 	fi
 done
